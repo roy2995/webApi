@@ -38,44 +38,36 @@ conMysql();
 
 function all(table) {
     return new Promise((resolve, reject) => {
-        connection.query(`SELECT * FROM ??`, [table], (err, results) => {
-            if (err) {
-                return reject(err);
-            }
-            resolve(results);
+        connection.query(`SELECT * FROM \`${table}\``, (error, result) => {
+            if (error) return reject(error);
+            resolve(result);
         });
     });
 }
 
 function user(table, id) {
     return new Promise((resolve, reject) => {
-        connection.query(`SELECT * FROM ?? WHERE id = ?`, [table, id], (err, results) => {
-            if (err) {
-                return reject(err);
-            }
-            resolve(results[0]);
+        connection.query(`SELECT * FROM \`${table}\` WHERE id = ?`, [id], (error, result) => {
+            if (error) return reject(error);
+            resolve(result);
         });
     });
 }
 
 function newUser(table, data) {
     return new Promise((resolve, reject) => {
-        connection.query(`INSERT INTO ?? SET ?`, [table, data], (err, results) => {
-            if (err) {
-                return reject(err);
-            }
-            resolve(results);
+        connection.query(`INSERT INTO \`${table}\` SET ?`, data, (error, result) => {
+            if (error) return reject(error);
+            resolve({ id: result.insertId, ...data }); // Devolver el ID insertado y los datos
         });
     });
 }
 
 function delet(table, id) {
     return new Promise((resolve, reject) => {
-        connection.query(`DELETE FROM ?? WHERE id = ?`, [table, id], (err, results) => {
-            if (err) {
-                return reject(err);
-            }
-            resolve(results);
+        connection.query(`DELETE FROM \`${table}\` WHERE id = ?`, [id], (error, result) => {
+            if (error) return reject(error);
+            resolve(result.affectedRows > 0); // Devolver true si se eliminó, false si no
         });
     });
 }
