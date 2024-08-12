@@ -58,16 +58,26 @@ function newUser(table, data) {
     return new Promise((resolve, reject) => {
         connection.query(`INSERT INTO \`${table}\` SET ?`, data, (error, result) => {
             if (error) return reject(error);
-            resolve({ id: result.insertId, ...data }); // Devolver el ID insertado y los datos
+            resolve({ id: result.insertId, ...data }); 
         });
     });
 }
 
-function delet(table, id) {
+function delet(table, condition, params) {
     return new Promise((resolve, reject) => {
-        connection.query(`DELETE FROM \`${table}\` WHERE id = ?`, [id], (error, result) => {
+        const query = `DELETE FROM \`${table}\` WHERE ${condition}`;
+        connection.query(query, params, (error, result) => {
             if (error) return reject(error);
-            resolve(result.affectedRows > 0); // Devolver true si se eliminó, false si no
+            resolve(result.affectedRows > 0); 
+        });
+    });
+}
+
+function query(sql, params) {
+    return new Promise((resolve, reject) => {
+        connection.query(sql, params, (error, result) => {
+            if (error) return reject(error);
+            resolve(result);
         });
     });
 }
@@ -76,5 +86,6 @@ module.exports = {
     all,
     user,
     newUser,
-    delet
-};
+    delet,
+    query
+}

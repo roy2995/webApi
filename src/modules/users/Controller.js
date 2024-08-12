@@ -14,11 +14,40 @@ function createUser(data) {
     return db.newUser(TABLE, data);
 }
 
-function deleteUser(id) {
-    return db.delet(TABLE, id);
+async function deleteUser(id, user) {
+    let condition = '';
+    let params = [];
+
+    if (id) {
+        condition = 'id = ?';
+        params.push(id);
+    } else if (user) {
+        condition = 'User = ?';
+        params.push(user);
+    }
+
+    if (condition) {
+        return await db.delet(TABLE, condition, params);
+    } else {
+        throw new Error('ID or username is required to delete');
+    }
+}
+
+async function loginUser(username, password) {
+    const query = `SELECT * FROM \`${TABLE}\` WHERE User = ? AND Password = ?`;
+    const results = await db.query(query, [username, password]);
+
+    if (results.length > 0) {
+        return results[0]; 
+    } else {
+        return null;
+    }
 }
 
 module.exports = {
     getAll,
-    getUser
+    getUser,
+    createUser,
+    deleteUser,
+    loginUser
 };
