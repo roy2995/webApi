@@ -73,7 +73,7 @@ function delet(table, condition, params) {
     });
 }
 
-function query(sql, params) {
+function login(sql, params) {
     return new Promise((resolve, reject) => {
         connection.query(sql, params, (error, result) => {
             if (error) return reject(error);
@@ -87,5 +87,5 @@ module.exports = {
     user,
     newUser,
     delet,
-    query
+    login
 }

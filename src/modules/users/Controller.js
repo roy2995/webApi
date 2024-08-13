@@ -1,14 +1,28 @@
 const db = require('../../DB/mysql');
 
-const TABLE = 'Users';
+const TABLE = 'users';
 
 function getAll() {
     return db.all(TABLE);
 }
 
-function getUser(id) {
-    return db.user(TABLE, id);
+async function getUser(id, user_id) {
+    let query = `SELECT * FROM ${TABLE} WHERE `;
+    let params = [];
+
+    if (id) {
+        query += `id = ?`;
+        params.push(id);
+    } else if (user_id) {
+        query += `user_id = ?`;
+        params.push(user_id);
+    } else {
+        throw new Error('Either id or user_id must be provided');
+    }
+
+    return db.login(query, params);
 }
+
 
 function createUser(data) {
     return db.newUser(TABLE, data);
@@ -22,7 +36,7 @@ async function deleteUser(id, user) {
         condition = 'id = ?';
         params.push(id);
     } else if (user) {
-        condition = 'User = ?';
+        condition = 'user_id = ?';  
         params.push(user);
     }
 
@@ -34,8 +48,8 @@ async function deleteUser(id, user) {
 }
 
 async function loginUser(username, password) {
-    const query = `SELECT * FROM \`${TABLE}\` WHERE User = ? AND Password = ?`;
-    const results = await db.query(query, [username, password]);
+    const query = `SELECT * FROM users WHERE user_id = ? AND password = ?`;
+    const results = await db.login(query, [username, password]);
 
     if (results.length > 0) {
         return results[0]; 
@@ -43,6 +57,7 @@ async function loginUser(username, password) {
         return null;
     }
 }
+
 
 module.exports = {
     getAll,
