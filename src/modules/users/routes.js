@@ -53,11 +53,11 @@ router.delete('/', async function(req, res) {
 
 router.post('/login', async function(req, res) {
     try {
-        const { User, Password } = req.body;
-        const user = await controller.loginUser(User, Password);
+        const { user, password } = req.body;  
+        const userRecord = await controller.loginUser(user, password);
 
-        if (user) {
-            responded.success(req, res, user, 200);
+        if (userRecord) {
+            responded.success(req, res, userRecord, 200);
         } else {
             responded.error(req, res, 'Invalid username or password', 401);
         }
@@ -65,5 +65,6 @@ router.post('/login', async function(req, res) {
         responded.error(req, res, err, 500);
     }
 });
+
 
 module.exports = router;

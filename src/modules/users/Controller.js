@@ -44,6 +44,7 @@ async function loginUser(username, password) {
     }
 }
 
+
 module.exports = {
     getAll,
     getUser,
