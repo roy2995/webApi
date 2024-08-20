@@ -1,6 +1,6 @@
 const db = require('../../DB/mysql');
 
-const TABLE = 'Users';
+const TABLE = 'users';
 
 function getAll() {
     return db.all(TABLE);
@@ -34,8 +34,8 @@ async function deleteUser(id, user) {
 }
 
 async function loginUser(username, password) {
-    const query = `SELECT * FROM \`${TABLE}\` WHERE User = ? AND Password = ?`;
-    const results = await db.query(query, [username, password]);
+    const query = `SELECT * FROM \`${TABLE}\` WHERE username = ? AND password = ?`;
+    const results = await db.login(query, [username, password]);
 
     if (results.length > 0) {
         return results[0]; 
@@ -43,6 +43,7 @@ async function loginUser(username, password) {
         return null;
     }
 }
+
 
 
 module.exports = {
