@@ -17,9 +17,17 @@ function conMysql() {
     connection.connect((err) => {
         if (err) {
             console.log(['db err'], err);
-            setTimeout(conMysql, 20000); 
+            setTimeout(conMysql, 20000);
         } else {
             console.log("db connected");
+
+            connection.query('SET SQL_SAFE_UPDATES = 0;', (err) => {
+                if (err) {
+                    console.error('Error al desactivar el modo seguro:', err);
+                    return;
+                }
+                console.log('Modo seguro desactivado para esta conexión.');
+            });
         }
     });
 
@@ -36,6 +44,7 @@ function conMysql() {
 
 conMysql();
 
+// Users query
 function all(table) {
     return new Promise((resolve, reject) => {
         connection.query(`SELECT * FROM \`${table}\``, (error, result) => {
@@ -73,7 +82,7 @@ function delet(table, condition, params) {
     });
 }
 
-function query(sql, params) {
+function login(sql, params) {
     return new Promise((resolve, reject) => {
         connection.query(sql, params, (error, result) => {
             if (error) return reject(error);
@@ -82,10 +91,37 @@ function query(sql, params) {
     });
 }
 
+// Buckets_group query
+function allUsers(table){
+    return new Promise((resolve, reject) =>{
+        connection.query(`SELECT * FROM \`${table}\``,(error, result) => {
+            if(error) return reject(error);
+            resolve(result);
+        })
+    })
+}
+
+
+function updateBuketsGroup(table, username, newBuketsId) {
+    return new Promise((resolve, reject) => {
+        const query = `UPDATE \`${table}\` SET bukets_id = ? WHERE username = ?`;
+        connection.query(query, [newBuketsId, username], (error, result) => {
+            if (error) {
+                console.error('Error en la consulta SQL:', error);
+                return reject(error);
+            }
+            resolve(result.affectedRows > 0);
+        });
+    });
+}
+
+
 module.exports = {
     all,
     user,
     newUser,
     delet,
-    query
+    login,
+    allUsers,
+    updateBuketsGroup
 }
