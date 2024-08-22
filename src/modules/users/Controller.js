@@ -1,5 +1,5 @@
 const db = require('../../DB/mysql');
-
+const bcrypt = require('bcrypt');
 const TABLE = 'users';
 
 function getAll() {
@@ -10,8 +10,8 @@ function getUser(id) {
     return db.user(TABLE, id);
 }
 
-function createUser(data) {
-    return db.newUser(TABLE, data);
+async function createUser(data) {
+    const saltRounds = 10;
 }
 
 async function deleteUser(id, user) {
