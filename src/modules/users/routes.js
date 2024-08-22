@@ -51,13 +51,17 @@ router.delete('/', async function(req, res) {
     }
 });
 
-router.post('/login', async function(req, res) {
+outer.post('/login', async function(req, res) {
     try {
         const { username, password } = req.body;  
-        const userRecord = await controller.loginUser(username, password);
+        const result = await controller.loginUser(username, password);
 
-        if (userRecord) {
-            responded.success(req, res, userRecord, 200);
+        if (result) {
+            // Retornar el token y los datos del usuario
+            responded.success(req, res, {
+                user: result.user,
+                token: result.token
+            }, 200);
         } else {
             responded.error(req, res, 'Invalid username or password', 401);
         }
