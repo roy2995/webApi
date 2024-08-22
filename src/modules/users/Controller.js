@@ -12,6 +12,11 @@ function getUser(id) {
 
 async function createUser(data) {
     const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(data.password, saltRounds);
+
+    data.password = hashedPassword;
+
+    return db.newUser(TABLE, data);
 }
 
 async function deleteUser(id, user) {
@@ -34,14 +39,19 @@ async function deleteUser(id, user) {
 }
 
 async function loginUser(username, password) {
-    const query = `SELECT * FROM \`${TABLE}\` WHERE username = ? AND password = ?`;
-    const results = await db.login(query, [username, password]);
+    const query = `SELECT * FROM \`${TABLE}\` WHERE username = ?`;
+    const results = await db.login(query, [username]);
 
     if (results.length > 0) {
-        return results[0]; 
-    } else {
-        return null;
+        const user = results[0];
+
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (isMatch) {
+            return user;
+        }
     }
+
+    return null;
 }
 
 
