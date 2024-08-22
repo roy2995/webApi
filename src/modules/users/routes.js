@@ -53,8 +53,8 @@ router.delete('/', async function(req, res) {
 
 router.post('/login', async function(req, res) {
     try {
-        const { user, password } = req.body;  
-        const userRecord = await controller.loginUser(user, password);
+        const { username, password } = req.body;  
+        const userRecord = await controller.loginUser(username, password);
 
         if (userRecord) {
             responded.success(req, res, userRecord, 200);
