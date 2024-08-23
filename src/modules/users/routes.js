@@ -51,7 +51,7 @@ router.delete('/', async function(req, res) {
     }
 });
 
-outer.post('/login', async function(req, res) {
+router.post('/login', async function(req, res) {
     try {
         const { username, password } = req.body;  
         const result = await controller.loginUser(username, password);

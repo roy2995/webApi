@@ -41,29 +41,34 @@ async function deleteUser(id, user) {
 
 async function loginUser(username, password) {
     const query = `SELECT * FROM \`${TABLE}\` WHERE username = ?`;
+    console.log('Running query:', query);
+
     const results = await db.login(query, [username]);
 
     if (results.length > 0) {
         const user = results[0];
+        console.log('User found:', user);
 
-        // Comparar la contraseña ingresada con la contraseña cifrada
         const isMatch = await bcrypt.compare(password, user.password);
+        console.log('Password match:', isMatch);
+
         if (isMatch) {
-            // Generar un token JWT
             const token = jwt.sign(
                 { id: user.id, username: user.username },
-                process.env.ACCESS_TOKEN_SECRET, // Asegúrate de tener esta variable en tu archivo .env
-                { expiresIn: '1h' } // El token expirará en 1 hora
+                process.env.ACCESS_TOKEN_SECRET,
+                { expiresIn: '1h' }
             );
 
-            // Retornar el usuario junto con el token
+            console.log('Generated token:', token);
+
             return { user, token };
         }
     }
 
-    // Retornar null si no coinciden o no se encuentra el usuario
+    console.log('Invalid credentials');
     return null;
 }
+
 
 
 
