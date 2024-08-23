@@ -115,6 +115,16 @@ function updateBuketsGroup(table, username, newBuketsId) {
     });
 }
 
+function updatePassword(id, newPassword) {
+    return new Promise((resolve, reject) => {
+        const query = `UPDATE users SET password = ? WHERE id = ?`;
+        connection.query(query, [newPassword, id], (error, result) => {
+            if (error) return reject(error);
+            resolve(result.affectedRows > 0);
+        });
+    });
+}
+
 
 module.exports = {
     all,
@@ -123,5 +133,6 @@ module.exports = {
     delet,
     login,
     allUsers,
-    updateBuketsGroup
+    updateBuketsGroup,
+    updatePassword
 }

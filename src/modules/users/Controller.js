@@ -1,5 +1,6 @@
 const db = require('../../DB/mysql');
-
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const TABLE = 'users';
 
 function getAll() {
@@ -10,7 +11,12 @@ function getUser(id) {
     return db.user(TABLE, id);
 }
 
-function createUser(data) {
+async function createUser(data) {
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(data.password, saltRounds);
+
+    data.password = hashedPassword;
+
     return db.newUser(TABLE, data);
 }
 
@@ -34,15 +40,35 @@ async function deleteUser(id, user) {
 }
 
 async function loginUser(username, password) {
-    const query = `SELECT * FROM \`${TABLE}\` WHERE username = ? AND password = ?`;
-    const results = await db.login(query, [username, password]);
+    const query = `SELECT * FROM \`${TABLE}\` WHERE username = ?`;
+    console.log('Running query:', query);
+
+    const results = await db.login(query, [username]);
 
     if (results.length > 0) {
-        return results[0]; 
-    } else {
-        return null;
+        const user = results[0];
+        console.log('User found:', user);
+
+        const isMatch = await bcrypt.compare(password, user.password);
+        console.log('Password match:', isMatch);
+
+        if (isMatch) {
+            const token = jwt.sign(
+                { id: user.id, username: user.username },
+                process.env.ACCESS_TOKEN_SECRET,
+                { expiresIn: '1h' }
+            );
+
+            console.log('Generated token:', token);
+
+            return { user, token };
+        }
     }
+
+    console.log('Invalid credentials');
+    return null;
 }
+
 
 
 
