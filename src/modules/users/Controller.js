@@ -53,15 +53,23 @@ async function loginUser(username, password) {
         console.log('Password match:', isMatch);
 
         if (isMatch) {
-            const token = jwt.sign(
-                { id: user.id, username: user.username },
+            const accessToken = jwt.sign(
+                { id: user.id, username: user.username, role: user.role }, // Incluir el rol en el token
                 process.env.ACCESS_TOKEN_SECRET,
                 { expiresIn: '1h' }
             );
 
-            console.log('Generated token:', token);
+            const refreshToken = jwt.sign(
+                { id: user.id, username: user.username, role: user.role }, // Incluir el rol en el refresh token
+                process.env.REFRESH_TOKEN_SECRET
+            );
 
-            return { user, token };
+            // Devolver el accessToken, refreshToken y el rol del usuario
+            return {
+                accessToken,
+                refreshToken,
+                role: user.role  // Incluir el rol aquí
+            };
         }
     }
 

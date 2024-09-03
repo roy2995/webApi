@@ -69,28 +69,20 @@ router.delete('/', authenticateToken, authorizeAdmin, async function(req, res) {
 router.post('/login', async function(req, res) {
     const { username, password } = req.body;
 
-    // Validate credentials and generate token
-    const user = await controller.loginUser(username, password);
+    // Validar credenciales y generar token
+    const userData = await controller.loginUser(username, password);
 
-    if (user) {
-        const accessToken = jwt.sign(
-            { id: user.id, username: user.username, role: user.role },
-            process.env.ACCESS_TOKEN_SECRET,
-            { expiresIn: '1h' }
-        );
-        const refreshToken = jwt.sign(
-            { id: user.id, username: user.username, role: user.role },
-            process.env.REFRESH_TOKEN_SECRET
-        );
-
+    if (userData) {
         res.json({
-            accessToken,
-            refreshToken
+            accessToken: userData.accessToken,
+            refreshToken: userData.refreshToken,
+            role: userData.role  // Aquí devolvemos el rol
         });
     } else {
         res.status(401).send('Invalid credentials');
     }
 });
+
 
 //refresh the token.Protected by token authentication. Only an authenticated user can renew their token
 router.post('/token/refresh', authenticateToken, (req, res) => {
