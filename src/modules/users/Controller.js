@@ -3,14 +3,17 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const TABLE = 'users';
 
-function getAll() {
+//all Users
+function getAllUsers() {
     return db.all(TABLE);
 }
 
-function getUser(id) {
+//user by Id
+function getUserById(id) {
     return db.user(TABLE, id);
 }
 
+//new user 
 async function createUser(data) {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(data.password, saltRounds);
@@ -20,70 +23,60 @@ async function createUser(data) {
     return db.newUser(TABLE, data);
 }
 
-async function deleteUser(id, user) {
-    let condition = '';
-    let params = [];
-
-    if (id) {
-        condition = 'id = ?';
-        params.push(id);
-    } else if (user) {
-        condition = 'User = ?';
-        params.push(user);
+//Update data user
+async function updateUser(id, data) {
+    if (data.password) {
+        const saltRounds = 10;
+        data.password = await bcrypt.hash(data.password, saltRounds);
     }
-
-    if (condition) {
-        return await db.delet(TABLE, condition, params);
-    } else {
-        throw new Error('ID or username is required to delete');
-    }
+    return db.update(TABLE, data, 'id = ?', [id]);
 }
 
+//delete user
+async function deleteUser(id) {
+    return db.delet(TABLE, 'id = ?', [id]);
+}
+
+//login function
 async function loginUser(username, password) {
     const query = `SELECT * FROM \`${TABLE}\` WHERE username = ?`;
-    console.log('Running query:', query);
-
     const results = await db.login(query, [username]);
 
     if (results.length > 0) {
         const user = results[0];
-        console.log('User found:', user);
-
         const isMatch = await bcrypt.compare(password, user.password);
-        console.log('Password match:', isMatch);
 
         if (isMatch) {
             const accessToken = jwt.sign(
-                { id: user.id, username: user.username, role: user.role }, // Incluir el rol en el token
+                { id: user.id, username: user.username, role: user.role },
                 process.env.ACCESS_TOKEN_SECRET,
                 { expiresIn: '1h' }
             );
-
             const refreshToken = jwt.sign(
-                { id: user.id, username: user.username, role: user.role }, // Incluir el rol en el refresh token
+                { id: user.id, username: user.username, role: user.role },
                 process.env.REFRESH_TOKEN_SECRET
             );
 
-            // Devolver el accessToken, refreshToken y el rol del usuario
             return {
+                user: {
+                    id: user.id,
+                    username: user.username,
+                    role: user.role
+                },
                 accessToken,
-                refreshToken,
-                role: user.role  // Incluir el rol aquí
+                refreshToken
             };
         }
     }
 
-    console.log('Invalid credentials');
     return null;
 }
 
-
-
-
 module.exports = {
-    getAll,
-    getUser,
+    getAllUsers,
+    getUserById,
     createUser,
+    updateUser,
     deleteUser,
     loginUser
 };
