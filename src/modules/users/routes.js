@@ -1,4 +1,5 @@
 const express = require('express');
+const { check, validationResult } = require('express-validator');
 const responded = require('../../red/response');
 const controller = require('./Controller');
 const authenticateToken = require('../../authMiddleware');
@@ -25,25 +26,69 @@ router.get('/:id', authenticateToken, async (req, res) => {
     }
 });
 
-// Create a new user
-router.post('/', authenticateToken, async (req, res) => {
-    try {
-        const newUser = await controller.createUser(req.body);
-        responded.success(req, res, newUser, 201);
-    } catch (err) {
-        responded.error(req, res, err, 500);
-    }
-});
+// Create a new user with validation and sanitization
+router.post(
+    '/',
+    authenticateToken,
+    [
+        // Validar el username
+        check('username')
+            .isAlphanumeric().withMessage('El nombre de usuario debe contener solo letras y números')
+            .isLength({ min: 3 }).withMessage('El nombre de usuario debe tener al menos 3 caracteres')
+            .trim().escape(),
+        // Validar la contraseña
+        check('password')
+            .isLength({ min: 5 }).withMessage('La contraseña debe tener al menos 5 caracteres')
+            .trim().escape()
+    ],
+    async (req, res) => {
+        // Manejo de errores de validación
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
 
-// Modify a user by ID
-router.put('/:id', authenticateToken, async (req, res) => {
-    try {
-        const updatedUser = await controller.updateUser(req.params.id, req.body);
-        responded.success(req, res, updatedUser, 200);
-    } catch (err) {
-        responded.error(req, res, err, 500);
+        try {
+            const newUser = await controller.createUser(req.body);
+            responded.success(req, res, newUser, 201);
+        } catch (err) {
+            responded.error(req, res, err, 500);
+        }
     }
-});
+);
+
+// Modify a user by ID with validation and sanitization
+router.put(
+    '/:id',
+    authenticateToken,
+    [
+        // Validar opcionalmente el username si es enviado
+        check('username')
+            .optional()
+            .isAlphanumeric().withMessage('El nombre de usuario debe contener solo letras y números')
+            .isLength({ min: 3 }).withMessage('El nombre de usuario debe tener al menos 3 caracteres')
+            .trim().escape(),
+        // Validar opcionalmente la contraseña si es enviada
+        check('password')
+            .optional()
+            .isLength({ min: 5 }).withMessage('La contraseña debe tener al menos 5 caracteres')
+            .trim().escape()
+    ],
+    async (req, res) => {
+        // Manejo de errores de validación
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+
+        try {
+            const updatedUser = await controller.updateUser(req.params.id, req.body);
+            responded.success(req, res, updatedUser, 200);
+        } catch (err) {
+            responded.error(req, res, err, 500);
+        }
+    }
+);
 
 // Delete a user by ID (admins only)
 router.delete('/:id', authenticateToken, async (req, res) => {
@@ -59,23 +104,58 @@ router.delete('/:id', authenticateToken, async (req, res) => {
     }
 });
 
-// User authentication (Login)
-router.post('/login', async (req, res) => {
-    const { username, password } = req.body;
+// User authentication (Login) with validation and sanitization
+router.post(
+    '/login',
+    [
+        // Validar y sanitizar el nombre de usuario
+        check('username')
+            .isAlphanumeric().withMessage('El nombre de usuario debe contener solo letras y números')
+            .isLength({ min: 3 }).withMessage('El nombre de usuario debe tener al menos 3 caracteres')
+            .trim().escape(),
+        // Validar y sanitizar la contraseña
+        check('password')
+            .not().isEmpty().withMessage('La contraseña es obligatoria')
+            .trim().escape()
+    ],
+    async (req, res) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+
+        const { username, password } = req.body;
+
+        try {
+            const result = await controller.loginUser(username, password);
+            if (result) {
+                res.json({
+                    user: result.user,
+                    accessToken: result.accessToken,
+                    refreshToken: result.refreshToken
+                });
+            } else {
+                responded.error(req, res, 'Usuario o contraseña incorrectos', 401);
+            }
+        } catch (err) {
+            responded.error(req, res, err, 500);
+        }
+    }
+);
+
+// Refresh token route
+router.post('/refresh', async (req, res) => {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+        return responded.error(req, res, 'Refresh token is required', 401);
+    }
 
     try {
-        const result = await controller.loginUser(username, password);
-        if (result) {
-            res.json({
-                user: result.user,
-                accessToken: result.accessToken,
-                refreshToken: result.refreshToken
-            });
-        } else {
-            responded.error(req, res, 'Invalid username or password', 401);
-        }
+        const newAccessToken = await controller.refreshAccessToken(refreshToken);
+        res.json({ accessToken: newAccessToken });
     } catch (err) {
-        responded.error(req, res, err, 500);
+        responded.error(req, res, err, 403);
     }
 });
 
