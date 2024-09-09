@@ -1,5 +1,4 @@
 const db = require('../../DB/mysql');
-
 const TABLE = 'attendance';
 
 // Obtener todas las asistencias
@@ -14,35 +13,20 @@ async function getAttendance(id) {
     return db.executeQuery(query, [id]);
 }
 
-// Crear una nueva asistencia
+// Crear una nueva asistencia (check-in)
 async function createAttendance(data) {
     const query = `INSERT INTO ${TABLE} (user_id, check_in, location, created_at) VALUES (?, ?, ST_GeomFromText(?), NOW())`;
     const values = [data.user_id, data.check_in, `POINT(${data.location.lat} ${data.location.lng})`];
     return db.executeQuery(query, values).then(result => ({ id: result.insertId, ...data }));
 }
 
-// Actualizar asistencia
+// Actualizar asistencia (check-out con fecha y hora)
 async function updateAttendance(id, data) {
-    try {
-        let query;
-        let values;
+    const query = `UPDATE ${TABLE} SET check_out = ?, created_at = NOW() WHERE id = ?`;
+    const values = [data.check_out, id];
 
-        if (data.location && data.location.lat && data.location.lng) {
-            // Si se proporcionan las coordenadas, actualiza `check_out` y `location`
-            query = `UPDATE ${TABLE} SET check_out = ?, location = ST_GeomFromText(?), created_at = NOW() WHERE id = ?`;
-            values = [data.check_out, `POINT(${data.location.lat} ${data.location.lng})`, id];
-        } else {
-            // Si no se proporcionan las coordenadas, solo actualiza `check_out`
-            query = `UPDATE ${TABLE} SET check_out = ?, created_at = NOW() WHERE id = ?`;
-            values = [data.check_out, id];
-        }
-
-        const result = await db.executeQuery(query, values);
-        return result.affectedRows > 0;
-    } catch (error) {
-        console.error('Error al actualizar asistencia:', error.message);
-        throw error;
-    }
+    const result = await db.executeQuery(query, values);
+    return result.affectedRows > 0;
 }
 
 // Eliminar una asistencia
@@ -51,9 +35,10 @@ async function deleteAttendance(id) {
     return db.executeQuery(query, [id]).then(result => result.affectedRows > 0);
 }
 
+// Verificar si el usuario ya hizo check-in hoy
 async function checkAttendanceToday(userId) {
     const query = `
-        SELECT * FROM attendance 
+        SELECT * FROM ${TABLE} 
         WHERE user_id = ? AND DATE(check_in) = CURDATE()`;
     
     const result = await db.executeQuery(query, [userId]);

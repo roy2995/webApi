@@ -72,11 +72,28 @@ async function loginUser(username, password) {
     return null;
 }
 
+async function refreshAccessToken(refreshToken) {
+    return new Promise((resolve, reject) => {
+        jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
+            if (err) return reject('Invalid refresh token');
+            
+            const newAccessToken = jwt.sign(
+                { id: user.id, username: user.username, role: user.role },
+                process.env.ACCESS_TOKEN_SECRET,
+                { expiresIn: '1h' }
+            );
+            resolve(newAccessToken);
+        });
+    });
+}
+
+
 module.exports = {
     getAllUsers,
     getUserById,
     createUser,
     updateUser,
     deleteUser,
-    loginUser
+    loginUser,
+    refreshAccessToken
 };
