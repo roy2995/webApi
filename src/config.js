@@ -9,7 +9,7 @@ const config = {
         user: process.env.MYSQL_USER || 'root',
         port: process.env.MYSQL_PORT || 3306,  
         password: process.env.MYSQL_PASSWORD || 'HAf7vMrJ3eNk8wKuAgwi9F72cAqiYyzd-Fi_D_32ZPkj26Ef6gDkdnawDqi2mZqM2aNX2Z',
-        database: process.env.MYSQL_DB || 'database'
+        database: process.env.MYSQL_DB || 'traveler'
     }
 };
 
