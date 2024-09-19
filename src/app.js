@@ -2,8 +2,11 @@ const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
 const config = require('./config');
+
 const users = require('./modules/users/routes');
+const groupRoutes = require('./modules/groups/routes');
 const attendanceRoutes = require('./modules/attendance/routes');
+const userGroupRoutes = require('./modules/user_groups/routes');
 
 const authenticateToken = require('./authMiddleware');
 
@@ -26,7 +29,8 @@ app.set('port', config.app.port);
 
 // Rutas
 app.use('/api/Users', users);
+app.use('/api/groups', authenticateToken, groupRoutes);
 app.use('/api/attendance', authenticateToken, attendanceRoutes);
-app.use('/api/attendance', authenticateToken, attendanceRoutes);
+app.use('/api/userGroups', authenticateToken, userGroupRoutes); 
 
 module.exports = app;
