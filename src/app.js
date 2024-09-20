@@ -2,26 +2,35 @@ const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
 const config = require('./config');
-const authenticateToken = require('./authMiddleware');
 
-// Importar las rutas
+const users = require('./modules/users/routes');
+const groupRoutes = require('./modules/groups/routes');
 const attendanceRoutes = require('./modules/attendance/routes');
-const userRoutes = require('./modules/users/routes');
+const userGroupRoutes = require('./modules/user_groups/routes');
+
+const authenticateToken = require('./authMiddleware');
 
 const app = express();
 
-// Middlewares
+// Middleware para permitir CORS
+app.use(cors({
+    origin: ' http://localhost:5173'
+}));
+
 app.use(cors());
+
+// Otros middlewares
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Configuración del puerto
 app.set('port', config.app.port);
 
-// Definir las rutas
+// Rutas
+app.use('/api/Users', users);
 app.use('/api/groups', authenticateToken, groupRoutes);
-app.use('/api/userGroups', userGroupRoutes); 
 app.use('/api/attendance', authenticateToken, attendanceRoutes);
-app.use('/api/users', userRoutes); 
+app.use('/api/userGroups', authenticateToken, userGroupRoutes); 
 
-module.exports = app;  // Exportar la app correctamente
+module.exports = app;
