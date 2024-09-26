@@ -29,12 +29,25 @@ async function updateUser(id, data) {
         const saltRounds = 10;
         data.password = await bcrypt.hash(data.password, saltRounds);
     }
-    return db.update(TABLE, data, 'id = ?', [id]);
+    const result = await db.update(TABLE, data, 'id = ?', [id]);
+
+    // Cambia el mensaje de respuesta para que coincida con el test
+    if (result.affectedRows > 0) {
+        return 'Usuario actualizado exitosamente';
+    }
+    return 'Error al actualizar usuario';
 }
+
 
 //delete user
 async function deleteUser(id) {
-    return db.delet(TABLE, 'id = ?', [id]);
+    const result = await db.delet(TABLE, 'id = ?', [id]);
+
+    // Cambia el mensaje de respuesta para que coincida con el test
+    if (result) {
+        return 'Usuario eliminado exitosamente';
+    }
+    return 'Error al eliminar usuario';
 }
 
 //login function

@@ -3,10 +3,14 @@ const morgan = require('morgan');
 const cors = require('cors');
 const config = require('./config');
 
-const users = require('./modules/users/routes');
-const groupRoutes = require('./modules/groups/routes');
+const userRoutes = require('./modules/users/routes');
 const attendanceRoutes = require('./modules/attendance/routes');
-const userGroupRoutes = require('./modules/user_groups/routes');
+const taskRoutes = require('./modules/task/routes');
+const userBucketRoutes = require('./modules/user_buckets/routes');
+const bucketRoutes = require('./modules/buckets/routes');
+const taskBucketRoutes = require('./modules/task_buckets/routes');
+const progressBucketRoutes = require('./modules/progress_buckets/routes');
+const progressTaskRoutes = require('./modules/progress_task/routes');
 
 const authenticateToken = require('./authMiddleware');
 
@@ -28,9 +32,13 @@ app.use(express.urlencoded({ extended: true }));
 app.set('port', config.app.port);
 
 // Rutas
-app.use('/api/Users', users);
-app.use('/api/groups', authenticateToken, groupRoutes);
+app.use('/api/users', userRoutes);
 app.use('/api/attendance', authenticateToken, attendanceRoutes);
-app.use('/api/userGroups', authenticateToken, userGroupRoutes); 
+app.use('/api/tasks', authenticateToken, taskRoutes);
+app.use('/api/user_buckets', authenticateToken, userBucketRoutes);
+app.use('/api/buckets', authenticateToken, bucketRoutes);
+app.use('/api/task_buckets', authenticateToken, taskBucketRoutes);
+app.use('/api/progress_buckets', authenticateToken, progressBucketRoutes);
+app.use('/api/progress_tasks', authenticateToken, progressTaskRoutes);
 
 module.exports = app;
