@@ -17,10 +17,11 @@ function conMysql() {
     connection.connect((err) => {
         if (err) {
             console.log(['db err'], err);
-            setTimeout(conMysql, 20000);
+            setTimeout(conMysql, 20000); // Si falla la conexión, intentamos reconectar
         } else {
             console.log("db connected");
 
+            // Desactivar modo seguro
             connection.query('SET SQL_SAFE_UPDATES = 0;', (err) => {
                 if (err) {
                     console.error('Error al desactivar el modo seguro:', err);
@@ -31,11 +32,12 @@ function conMysql() {
         }
     });
 
+    // Manejar los errores de la conexión
     connection.on('error', err => {
         console.log('[db err]', err);
 
         if (err.code === 'PROTOCOL_CONNECTION_LOST') {
-            conMysql();
+            conMysql(); // Reconectar automáticamente si la conexión se pierde
         } else {
             throw err;
         }
@@ -44,8 +46,22 @@ function conMysql() {
 
 conMysql();
 
+// Función para cerrar la conexión
+function endConnection() {
+    if (connection) {
+        return new Promise((resolve, reject) => {
+            connection.end((err) => {
+                if (err) return reject(err);
+                console.log('Conexión a la base de datos cerrada.');
+                resolve();
+            });
+        });
+    }
+}
+
 // Función genérica para ejecutar cualquier consulta
 function executeQuery(query, params = []) {
+    console.log("Executing query:", query, "with params:", params); // Verificar las queries que se ejecutan
     return new Promise((resolve, reject) => {
         connection.query(query, params, (error, result) => {
             if (error) return reject(error);
@@ -54,7 +70,19 @@ function executeQuery(query, params = []) {
     });
 }
 
-// Consultas específicas para usuarios
+// Nueva función para actualizar usuarios o cualquier tabla
+function update(table, data, condition, params) {
+    const query = `UPDATE \`${table}\` SET ? WHERE ${condition}`;
+    console.log(`Update query: ${query}`, data, params); // Log para verificar la query
+    return new Promise((resolve, reject) => {
+        connection.query(query, [data, ...params], (error, result) => {
+            if (error) return reject(error);
+            resolve(result);
+        });
+    });
+}
+
+// Consultas específicas para usuarios y otros datos
 function all(table) {
     const query = `SELECT * FROM \`${table}\``;
     return executeQuery(query);
@@ -79,33 +107,13 @@ function login(sql, params) {
     return executeQuery(sql, params);
 }
 
-function updateBuketsGroup(table, username, newBuketsId) {
-    const query = `UPDATE \`${table}\` SET bukets_id = ? WHERE username = ?`;
-    return executeQuery(query, [newBuketsId, username]).then(result => result.affectedRows > 0);
-}
-
-function updatePassword(id, newPassword) {
-    const query = `UPDATE users SET password = ? WHERE id = ?`;
-    return executeQuery(query, [newPassword, id]).then(result => result.affectedRows > 0);
-}
-
-function allUsers(table) {
-    return new Promise((resolve, reject) => {
-        connection.query(`SELECT * FROM \`${table}\``, (error, result) => {
-            if (error) return reject(error);
-            resolve(result);
-        });
-    });
-}
-
 module.exports = {
     all,
     user,
     newUser,
     delet,
     login,
-    allUsers,
-    updateBuketsGroup,
-    updatePassword,
-    executeQuery
+    update,  // Asegúrate de exportar la función de actualización
+    executeQuery,
+    endConnection, // Exportamos la función para cerrar la conexión
 };
