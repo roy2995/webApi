@@ -2,10 +2,9 @@ const request = require('supertest');
 const app = require('../src/app');
 const db = require('../src/DB/mysql');
 
-describe('API User Buckets Endpoints', () => {
+describe('API Buckets Endpoints', () => {
     let token;
-    let userId = 2; // Usamos el user_id que mencionaste
-    let bucketId = 1; // bucket_id que se usó en la inserción manual
+    let bucketId;
 
     beforeAll(async () => {
         const res = await request(app)
@@ -13,86 +12,50 @@ describe('API User Buckets Endpoints', () => {
             .send({ username: 'resquivel', password: '220506' });
 
         token = res.body.accessToken;
-        console.log('Access token obtenido:', token);
     });
 
-    it('Debería asignar un bucket a un usuario', async () => {
-        const newBucket = { user_id: userId, bucket_id: bucketId };
-        console.log('Request enviado con datos:', newBucket);
-        
-        try {
-            const res = await request(app)
-                .post('/api/user_buckets')
-                .set('Authorization', `Bearer ${token}`)
-                .send(newBucket);
+    it('Debería crear un nuevo bucket', async () => {
+        const newBucket = { Tipo: 'Tipo de prueba', Area: 'Area de prueba', Terminal: 'Terminal de prueba', Nivel: 'Nivel de prueba' };
+        const res = await request(app)
+            .post('/api/buckets')
+            .set('Authorization', `Bearer ${token}`)
+            .send(newBucket);
 
-            console.log('Response body:', res.body);
-
-            // Verificar si ocurrió un error
-            if (res.statusCode !== 201) {
-                console.error('Error al asignar bucket al usuario:', res.body);
-            }
-
-            // Verificar que el estado sea 201
-            expect(res.statusCode).toEqual(201);
-            // Verificar que el cuerpo contenga los atributos user_id y bucket_id
-            expect(res.body.body).toHaveProperty('user_id');
-            expect(res.body.body).toHaveProperty('bucket_id');
-
-            // Guardar el user_id y bucket_id para los siguientes tests
-            userId = res.body.body.user_id;
-            bucketId = res.body.body.bucket_id;
-
-        } catch (error) {
-            console.error('Error en la solicitud de asignación de bucket:', error);
-        }
+        expect(res.statusCode).toEqual(201);
+        expect(res.body.body).toHaveProperty('id');
+        bucketId = res.body.body.id; // Guardamos el ID del bucket creado
     });
 
-    it('Debería actualizar el bucket de un usuario', async () => {
-        // Verificación para asegurar que userId no sea undefined
-        if (!userId) {
-            throw new Error('userId no está definido. Verifica el test anterior.');
-        }
-
-        const updatedBucket = { bucket_id: 3 };
-
-        try {
-            const res = await request(app)
-                .put(`/api/user_buckets/${userId}`)
-                .set('Authorization', `Bearer ${token}`)
-                .send(updatedBucket);
-
-            console.log('Update response:', res.body);
-
-            expect(res.statusCode).toEqual(200);
-            expect(res.body.body).toEqual('Bucket actualizado exitosamente');
-        } catch (error) {
-            console.error('Error en la solicitud de actualización de bucket:', error);
-        }
+    it('Debería obtener un bucket específico por ID', async () => {
+        const res = await request(app)
+            .get(`/api/buckets/${bucketId}`)
+            .set('Authorization', `Bearer ${token}`);
+        expect(res.statusCode).toEqual(200);
+        expect(res.body.body[0]).toHaveProperty('ID');
+        expect(res.body.body[0].ID).toBe(bucketId); // Verificamos que el ID es correcto
     });
 
-    it('Debería eliminar un bucket de un usuario', async () => {
-        // Verificación para asegurar que bucketId no sea undefined
-        if (!bucketId) {
-            throw new Error('bucketId no está definido. Verifica el test anterior.');
-        }
+    it('Debería actualizar un bucket existente', async () => {
+        const updatedBucket = { Tipo: 'Tipo actualizado', Area: 'Area actualizada', Terminal: 'Terminal actualizada', Nivel: 'Nivel actualizado' };
+        const res = await request(app)
+            .put(`/api/buckets/${bucketId}`)
+            .set('Authorization', `Bearer ${token}`)
+            .send(updatedBucket);
 
-        try {
-            const res = await request(app)
-                .delete(`/api/user_buckets/${bucketId}`)
-                .set('Authorization', `Bearer ${token}`);
+        expect(res.statusCode).toEqual(200);
+        expect(res.body.body).toEqual('Bucket actualizado exitosamente');
+    });
 
-            console.log('Delete response:', res.body);
+    it('Debería eliminar un bucket existente', async () => {
+        const res = await request(app)
+            .delete(`/api/buckets/${bucketId}`)
+            .set('Authorization', `Bearer ${token}`);
 
-            expect(res.statusCode).toEqual(200);
-            expect(res.body.body).toEqual('Bucket eliminado exitosamente');
-        } catch (error) {
-            console.error('Error en la solicitud de eliminación de bucket:', error);
-        }
+        expect(res.statusCode).toEqual(200);
+        expect(res.body.body).toEqual('Bucket eliminado exitosamente');
     });
 
     afterAll(async () => {
         await db.endConnection();
-        console.log('Conexión a la base de datos cerrada.');
     });
 });

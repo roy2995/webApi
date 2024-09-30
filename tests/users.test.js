@@ -1,5 +1,5 @@
 const request = require('supertest');
-const app = require('../src/app'); // Ruta corregida
+const app = require('../src/app'); 
 
 let token;
 let userId;
@@ -7,7 +7,6 @@ let userId;
 describe('API Users Endpoints', () => {
   
   beforeAll(async () => {
-    // Obtener el token de autenticación usando el usuario resquivel
     const loginRes = await request(app)
       .post('/api/users/login') 
       .send({
@@ -16,21 +15,21 @@ describe('API Users Endpoints', () => {
       });
 
     expect(loginRes.statusCode).toEqual(200);
-    token = loginRes.body.accessToken; // Asume que el token está en accessToken
+    token = loginRes.body.accessToken; 
   });
 
   it('Debería crear un nuevo usuario', async () => {
     const res = await request(app)
       .post('/api/users')
-      .set('Authorization', `Bearer ${token}`) // Agregar el token a la cabecera
+      .set('Authorization', `Bearer ${token}`) 
       .send({
         username: 'testuser',
         password: 'testpassword'
       });
 
     expect(res.statusCode).toEqual(201);
-    expect(res.body.body).toHaveProperty('id'); // Revisar la estructura de la respuesta
-    userId = res.body.body.id; // Guardar el ID del usuario para los otros tests
+    expect(res.body.body).toHaveProperty('id');
+    userId = res.body.body.id;
   });
 
   it('Debería obtener un usuario por ID', async () => {
@@ -54,7 +53,7 @@ describe('API Users Endpoints', () => {
       });
 
     expect(res.statusCode).toEqual(200);
-    expect(res.body.body).toEqual('Usuario actualizado exitosamente'); // Coincide con lo devuelto
+    expect(res.body.body).toEqual('Usuario actualizado exitosamente');
   });
 
   it('Debería eliminar un usuario existente', async () => {
@@ -63,6 +62,6 @@ describe('API Users Endpoints', () => {
       .set('Authorization', `Bearer ${token}`); 
 
     expect(res.statusCode).toEqual(200);
-    expect(res.body.body).toEqual('User deleted successfully'); // Coincide con lo devuelto
+    expect(res.body.body).toEqual('User deleted successfully');
   });
 });

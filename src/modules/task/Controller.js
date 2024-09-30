@@ -15,15 +15,15 @@ async function getTaskById(id) {
 
 // Crear una nueva tarea
 async function createTask(data) {
-    const query = `INSERT INTO ${TABLE} (name, info) VALUES (?, ?)`;
-    const values = [data.name, data.info];
+    const query = `INSERT INTO ${TABLE} (Type, info) VALUES (?, ?)`;
+    const values = [data.Type, data.info];
     return db.executeQuery(query, values).then(result => ({ id: result.insertId, ...data }));
 }
 
 // Actualizar una tarea existente
 async function updateTask(id, data) {
-    const query = `UPDATE ${TABLE} SET name = ?, info = ? WHERE id = ?`;
-    const values = [data.name, data.info, id];
+    const query = `UPDATE ${TABLE} SET Type = ?, info = ? WHERE id = ?`;
+    const values = [data.Type, data.info, id];
     return db.executeQuery(query, values).then(result => result.affectedRows > 0);
 }
 
