@@ -31,7 +31,7 @@ describe('API Attendance Endpoints', () => {
             .set('Authorization', `Bearer ${token}`);
 
         expect(res.statusCode).toEqual(200);
-        expect(res.body.body[0]).toHaveProperty('id'); // Acceder al primer elemento del array
+        expect(res.body.body[0]).toHaveProperty('id'); 
         expect(res.body.body[0].id).toBe(attendanceId);
     });
 
@@ -41,7 +41,7 @@ describe('API Attendance Endpoints', () => {
             .set('Authorization', `Bearer ${token}`);
 
         expect(res.statusCode).toEqual(200);
-        expect(res.body.body).toEqual('Asistencia eliminada con éxito'); // Cambiado para coincidir con el mensaje real
+        expect(res.body.body).toEqual('Asistencia eliminada con éxito'); 
     });
 
     afterAll(async () => {
