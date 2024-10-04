@@ -1,92 +1,102 @@
 const request = require('supertest');
-const app = require('../src/app');
-const db = require('../src/DB/mysql');
+const app = require('../src/app'); // Importa tu aplicación de Express
+
+let token;
+const user_id = 23;
+const bucket_id = 1;
 
 describe('API User Buckets Endpoints', () => {
-    let token;
-    let userId = 2; 
-    let bucketId = 1; 
 
     beforeAll(async () => {
+        // Autenticarse y obtener un token válido
         const res = await request(app)
             .post('/api/users/login')
-            .send({ username: 'resquivel', password: '220506' });
+            .send({ username: 'resquivel', password: '220506' });  // Usamos la contraseña correcta
 
-        token = res.body.accessToken;
-        console.log('Access token obtenido:', token);
-    });
-
-    it('Debería asignar un bucket a un usuario', async () => {
-        const newBucket = { user_id: userId, bucket_id: bucketId };
-        console.log('Request enviado con datos:', newBucket);
-        
-        try {
-            const res = await request(app)
-                .post('/api/user_buckets')
-                .set('Authorization', `Bearer ${token}`)
-                .send(newBucket);
-
-            console.log('Response body:', res.body);
-
-            if (res.statusCode !== 201) {
-                console.error('Error al asignar bucket al usuario:', res.body);
+        // Captura el token desde el campo accessToken
+        if (res.statusCode === 200) {
+            token = res.body.accessToken;  // Acceso al token desde res.body.accessToken
+            
+            if (!token) {
+                console.error('El accessToken no fue devuelto correctamente. Respuesta:', res.body);
+            } else {
+                console.log('Access token obtenido:', token);
             }
-
-            expect(res.statusCode).toEqual(201);
-            expect(res.body.body).toHaveProperty('user_id');
-            expect(res.body.body).toHaveProperty('bucket_id');
-
-            userId = res.body.body.user_id;
-            bucketId = res.body.body.bucket_id;
-
-        } catch (error) {
-            console.error('Error en la solicitud de asignación de bucket:', error);
+        } else {
+            console.error('Error en el login. Código de estado:', res.statusCode, 'Respuesta:', res.body);
         }
     });
 
-    it('Debería actualizar el bucket de un usuario', async () => {
-        if (!userId) {
-            throw new Error('userId no está definido. Verifica el test anterior.');
-        }
+    // Test para asignar un bucket a un usuario
+    test('Debería asignar un bucket a un usuario', async () => {
+        const requestData = { user_id, bucket_id };
+        console.log('Request enviado con datos:', requestData);
 
-        const updatedBucket = { bucket_id: 3 };
+        const res = await request(app)
+            .post('/api/user_buckets')
+            .set('Authorization', `Bearer ${token}`) // Incluye el token en la cabecera
+            .send(requestData);
 
-        try {
-            const res = await request(app)
-                .put(`/api/user_buckets/${userId}`)
-                .set('Authorization', `Bearer ${token}`)
-                .send(updatedBucket);
-
-            console.log('Update response:', res.body);
-
-            expect(res.statusCode).toEqual(200);
-            expect(res.body.body).toEqual('Bucket actualizado exitosamente');
-        } catch (error) {
-            console.error('Error en la solicitud de actualización de bucket:', error);
-        }
+        expect(res.statusCode).toEqual(201);
+        expect(res.body.body).toHaveProperty('id');
+        console.log('Response body:', res.body);
     });
 
-    it('Debería eliminar un bucket de un usuario', async () => {
-        if (!bucketId) {
-            throw new Error('bucketId no está definido. Verifica el test anterior.');
-        }
+    // Test para obtener todos los user_buckets
+    test('Debería obtener todos los user_buckets', async () => {
+        const res = await request(app)
+            .get('/api/user_buckets')
+            .set('Authorization', `Bearer ${token}`);
 
-        try {
-            const res = await request(app)
-                .delete(`/api/user_buckets/${bucketId}`)
-                .set('Authorization', `Bearer ${token}`);
+        expect(res.statusCode).toEqual(200);
+        expect(Array.isArray(res.body.body)).toBe(true);
+        console.log('Todos los user_buckets:', res.body.body);
+    });
 
-            console.log('Delete response:', res.body);
+    // Test para obtener los user_buckets por ID de usuario
+    test('Debería obtener un user_bucket por ID de usuario', async () => {
+        const res = await request(app)
+            .get(`/api/user_buckets/${user_id}`)
+            .set('Authorization', `Bearer ${token}`);
+    
+        expect(res.statusCode).toEqual(200);
+        
+        // Verifica que la respuesta es un array y accede al primer elemento
+        const userBucket = res.body.body[0]; // Accede al primer elemento del array
+    
+        // Verifica que el user_id del primer elemento es el esperado
+        expect(userBucket).toHaveProperty('user_id', user_id);
+        console.log(`User_bucket para user_id ${user_id}:`, userBucket);
+    });
+    
 
-            expect(res.statusCode).toEqual(200);
-            expect(res.body.body).toEqual('Bucket eliminado exitosamente');
-        } catch (error) {
-            console.error('Error en la solicitud de eliminación de bucket:', error);
-        }
+    // Test para actualizar el bucket de un usuario
+    test('Debería actualizar el bucket de un usuario', async () => {
+        const newBucketId = 3;
+        console.log('Actualizando bucket para el usuario:', user_id, 'con bucketId:', newBucketId);
+
+        const res = await request(app)
+            .put(`/api/user_buckets/${user_id}`)
+            .set('Authorization', `Bearer ${token}`)
+            .send({ bucket_id: newBucketId });
+
+        expect(res.statusCode).toEqual(200);
+        expect(res.body.body).toEqual('User_bucket actualizado exitosamente');
+        console.log('Update response:', res.body);
+    });
+
+    // Test para eliminar un user_bucket
+    test('Debería eliminar un user_bucket', async () => {
+        const res = await request(app)
+            .delete(`/api/user_buckets/${user_id}`)
+            .set('Authorization', `Bearer ${token}`);
+
+        expect(res.statusCode).toEqual(200);
+        expect(res.body.body).toEqual('User_bucket eliminado exitosamente');
+        console.log(`User_bucket con user_id ${user_id} eliminado.`);
     });
 
     afterAll(async () => {
-        await db.endConnection();
         console.log('Conexión a la base de datos cerrada.');
     });
 });
