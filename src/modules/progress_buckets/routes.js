@@ -1,7 +1,7 @@
 const express = require('express');
-const responded = require('../../red/response');
-const controller = require('./Controller');
-const authenticateToken = require('../../authMiddleware');
+const responded = require('../../red/response'); // Controlador de respuestas
+const controller = require('./Controller'); // Controlador de progress_buckets
+const authenticateToken = require('../../authMiddleware'); // Middleware de autenticación
 
 const router = express.Router();
 
@@ -15,17 +15,21 @@ router.get('/', authenticateToken, async (req, res) => {
     }
 });
 
-// Obtener el progreso de un bucket por ID
+// Obtener un progreso de bucket por ID
 router.get('/:id', authenticateToken, async (req, res) => {
     try {
         const progressBucket = await controller.getProgressBucketById(req.params.id);
-        responded.success(req, res, progressBucket, 200);
+        if (progressBucket) {
+            responded.success(req, res, progressBucket, 200);
+        } else {
+            responded.error(req, res, 'Progreso de bucket no encontrado', 404);
+        }
     } catch (err) {
         responded.error(req, res, 'Error al obtener el progreso del bucket', 500);
     }
 });
 
-// Crear un nuevo progreso para un bucket
+// Crear un nuevo progreso de bucket
 router.post('/', authenticateToken, async (req, res) => {
     try {
         const newProgressBucket = await controller.createProgressBucket(req.body);
@@ -42,7 +46,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
         if (updatedProgressBucket) {
             responded.success(req, res, 'Progreso del bucket actualizado exitosamente', 200);
         } else {
-            responded.error(req, res, 'No se encontró el progreso del bucket', 404);
+            responded.error(req, res, 'Progreso de bucket no encontrado', 404);
         }
     } catch (err) {
         responded.error(req, res, 'Error al actualizar el progreso del bucket', 500);
@@ -56,7 +60,7 @@ router.delete('/:id', authenticateToken, async (req, res) => {
         if (result) {
             responded.success(req, res, 'Progreso del bucket eliminado exitosamente', 200);
         } else {
-            responded.error(req, res, 'No se encontró el progreso del bucket', 404);
+            responded.error(req, res, 'Progreso de bucket no encontrado', 404);
         }
     } catch (err) {
         responded.error(req, res, 'Error al eliminar el progreso del bucket', 500);

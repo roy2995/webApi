@@ -1,7 +1,7 @@
 const express = require('express');
-const responded = require('../../red/response');
-const controller = require('./Controller');
-const authenticateToken = require('../../authMiddleware');
+const responded = require('../../red/response'); // Control de respuestas
+const controller = require('./Controller'); // Controlador de progress_task
+const authenticateToken = require('../../authMiddleware'); // Middleware de autenticación
 
 const router = express.Router();
 
@@ -19,7 +19,11 @@ router.get('/', authenticateToken, async (req, res) => {
 router.get('/:id', authenticateToken, async (req, res) => {
     try {
         const progressTask = await controller.getProgressTaskById(req.params.id);
-        responded.success(req, res, progressTask, 200);
+        if (progressTask) {
+            responded.success(req, res, progressTask, 200);
+        } else {
+            responded.error(req, res, 'Progreso de tarea no encontrado', 404);
+        }
     } catch (err) {
         responded.error(req, res, 'Error al obtener el progreso de la tarea', 500);
     }
@@ -40,9 +44,9 @@ router.put('/:id', authenticateToken, async (req, res) => {
     try {
         const updatedProgressTask = await controller.updateProgressTask(req.params.id, req.body);
         if (updatedProgressTask) {
-            responded.success(req, res, 'Progreso de la tarea actualizado exitosamente', 200);
+            responded.success(req, res, 'Progreso de tarea actualizado exitosamente', 200);
         } else {
-            responded.error(req, res, 'No se encontró el progreso de la tarea', 404);
+            responded.error(req, res, 'Progreso de tarea no encontrado', 404);
         }
     } catch (err) {
         responded.error(req, res, 'Error al actualizar el progreso de la tarea', 500);
@@ -54,9 +58,9 @@ router.delete('/:id', authenticateToken, async (req, res) => {
     try {
         const result = await controller.deleteProgressTask(req.params.id);
         if (result) {
-            responded.success(req, res, 'Progreso de la tarea eliminado exitosamente', 200);
+            responded.success(req, res, 'Progreso de tarea eliminado exitosamente', 200);
         } else {
-            responded.error(req, res, 'No se encontró el progreso de la tarea', 404);
+            responded.error(req, res, 'Progreso de tarea no encontrado', 404);
         }
     } catch (err) {
         responded.error(req, res, 'Error al eliminar el progreso de la tarea', 500);

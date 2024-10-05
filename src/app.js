@@ -3,25 +3,25 @@ const morgan = require('morgan');
 const cors = require('cors');
 const config = require('./config');
 
+// Importa todas las rutas
 const userRoutes = require('./modules/users/routes');
 const attendanceRoutes = require('./modules/attendance/routes');
 const taskRoutes = require('./modules/task/routes');
 const userBucketRoutes = require('./modules/user_buckets/routes');
 const bucketRoutes = require('./modules/buckets/routes');
 const taskBucketRoutes = require('./modules/task_buckets/routes');
-const progressBucketRoutes = require('./modules/progress_buckets/routes');
+const progressBucketRoutes = require('./modules/progress_buckets/routes'); // Agregar esta línea
+const contingenciesRoutes = require('./modules/contigencies/routes');
 const progressTaskRoutes = require('./modules/progress_task/routes');
-
+const reportsRoutes = require('./modules/reports/routes');
 const authenticateToken = require('./authMiddleware');
 
 const app = express();
 
 // Middleware para permitir CORS
 app.use(cors({
-    origin: ' http://localhost:5173'
+    origin: 'http://localhost:5173'
 }));
-
-app.use(cors());
 
 // Otros middlewares
 app.use(morgan('dev'));
@@ -38,7 +38,9 @@ app.use('/api/tasks', authenticateToken, taskRoutes);
 app.use('/api/user_buckets', authenticateToken, userBucketRoutes);
 app.use('/api/buckets', authenticateToken, bucketRoutes);
 app.use('/api/task_buckets', authenticateToken, taskBucketRoutes);
-app.use('/api/progress_buckets', authenticateToken, progressBucketRoutes);
+app.use('/api/progress_buckets', progressBucketRoutes); // Registrar la ruta aquí
 app.use('/api/progress_tasks', authenticateToken, progressTaskRoutes);
+app.use('/api/contingencies', contingenciesRoutes);
+app.use('/api/reports', authenticateToken, reportsRoutes);
 
 module.exports = app;
