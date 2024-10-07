@@ -31,18 +31,15 @@ router.post(
     '/',
     authenticateToken,
     [
-        // Validar el username
         check('username')
             .isAlphanumeric().withMessage('El nombre de usuario debe contener solo letras y números')
             .isLength({ min: 3 }).withMessage('El nombre de usuario debe tener al menos 3 caracteres')
             .trim().escape(),
-        // Validar la contraseña
         check('password')
             .isLength({ min: 5 }).withMessage('La contraseña debe tener al menos 5 caracteres')
             .trim().escape()
     ],
     async (req, res) => {
-        // Manejo de errores de validación
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
@@ -62,20 +59,17 @@ router.put(
     '/:id',
     authenticateToken,
     [
-        // Validar opcionalmente el username si es enviado
         check('username')
             .optional()
             .isAlphanumeric().withMessage('El nombre de usuario debe contener solo letras y números')
             .isLength({ min: 3 }).withMessage('El nombre de usuario debe tener al menos 3 caracteres')
             .trim().escape(),
-        // Validar opcionalmente la contraseña si es enviada
         check('password')
             .optional()
             .isLength({ min: 5 }).withMessage('La contraseña debe tener al menos 5 caracteres')
             .trim().escape()
     ],
     async (req, res) => {
-        // Manejo de errores de validación
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
@@ -108,12 +102,10 @@ router.delete('/:id', authenticateToken, async (req, res) => {
 router.post(
     '/login',
     [
-        // Validar y sanitizar el nombre de usuario
         check('username')
             .isAlphanumeric().withMessage('El nombre de usuario debe contener solo letras y números')
             .isLength({ min: 3 }).withMessage('El nombre de usuario debe tener al menos 3 caracteres')
             .trim().escape(),
-        // Validar y sanitizar la contraseña
         check('password')
             .not().isEmpty().withMessage('La contraseña es obligatoria')
             .trim().escape()

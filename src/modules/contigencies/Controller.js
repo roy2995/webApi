@@ -22,7 +22,7 @@ async function getContingencyById(id) {
     const query = 'SELECT * FROM contingencies WHERE id = ?';
     const results = await db.executeQuery(query, [id]);
     if (results.length > 0) {
-        return results[0]; // Devolvemos el primer resultado
+        return results[0];
     } else {
         throw new Error(`No se encontró la contingencia con ID ${id}`);
     }
@@ -35,7 +35,7 @@ async function updateContingency(id, name) {
     const result = await db.executeQuery(query, [name, id]);
 
     if (result.affectedRows > 0) {
-        return true; // Actualización exitosa
+        return true; 
     } else {
         throw new Error(`No se encontró la contingencia con ID ${id}`);
     }
@@ -47,7 +47,7 @@ async function deleteContingency(id) {
     const result = await db.executeQuery(query, [id]);
 
     if (result.affectedRows > 0) {
-        return true; // Eliminación exitosa
+        return true;
     } else {
         throw new Error(`No se encontró la contingencia con ID ${id}`);
     }

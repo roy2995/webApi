@@ -12,7 +12,6 @@ async function assignBucketToUser(data) {
             bucket_id: data.bucket_id
         };
     } catch (error) {
-        // Si el user_id ya existe (clave única), capturamos el error
         if (error.code === 'ER_DUP_ENTRY') {
             throw new Error(`El user_id ${data.user_id} ya tiene un bucket asignado.`);
         }
@@ -36,14 +35,13 @@ async function getBucketsByUserId(userId) {
 async function updateUserBucket(userId, bucketId) {
     console.log('Actualizando bucket para el usuario:', userId, 'con bucketId:', bucketId);
 
-    // Consulta SQL para actualizar basado en user_id único
     const query = 'UPDATE user_buckets SET bucket_id = ? WHERE user_id = ?';
     const result = await db.executeQuery(query, [bucketId, userId]);
 
     console.log('Resultado de la actualización:', result);
     
     if (result.affectedRows > 0) {
-        return true; // La actualización fue exitosa
+        return true;
     } else {
         throw new Error(`No se encontró el user_bucket para el user_id ${userId}`);
     }
@@ -51,11 +49,11 @@ async function updateUserBucket(userId, bucketId) {
 
 // Eliminar un bucket asignado a un usuario (usando user_id)
 async function deleteUserBucket(userId) {
-    const query = 'DELETE FROM user_buckets WHERE user_id = ?'; // Eliminar basado en user_id
+    const query = 'DELETE FROM user_buckets WHERE user_id = ?';
     const result = await db.executeQuery(query, [userId]);
 
     if (result.affectedRows > 0) {
-        return true; // Eliminación exitosa
+        return true; 
     } else {
         throw new Error(`No se encontró el user_bucket para el user_id ${userId}`);
     }

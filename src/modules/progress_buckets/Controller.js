@@ -18,7 +18,7 @@ async function createProgressBucket(data) {
     const query = `INSERT INTO ${TABLE} (bucket_id, status, user_id, date) VALUES (?, ?, ?, ?)`;
     const values = [data.bucket_id, data.status, data.user_id, data.date];
     return db.executeQuery(query, values)
-        .then(result => ({ id: result.insertId, ...data }))  // Asegúrate de que el insertId se devuelva correctamente
+        .then(result => ({ id: result.insertId, ...data })) 
         .catch(error => { 
             console.error('Error en la creación del progreso de bucket:', error); 
             throw error; 
