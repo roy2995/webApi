@@ -38,7 +38,7 @@ app.use('/api/tasks', authenticateToken, taskRoutes);
 app.use('/api/user_buckets', authenticateToken, userBucketRoutes);
 app.use('/api/buckets', authenticateToken, bucketRoutes);
 app.use('/api/task_buckets', authenticateToken, taskBucketRoutes);
-app.use('/api/progress_buckets', progressBucketRoutes); // Registrar la ruta aquí
+app.use('/api/progress_buckets', progressBucketRoutes);
 app.use('/api/progress_tasks', authenticateToken, progressTaskRoutes);
 app.use('/api/contingencies', contingenciesRoutes);
 app.use('/api/reports', authenticateToken, reportsRoutes);

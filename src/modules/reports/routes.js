@@ -1,8 +1,7 @@
 const express = require('express');
-const responded = require('../../red/response'); // Controlador de respuestas
-const controller = require('./Controller'); // Controlador que maneja la lógica de reports
-const authenticateToken = require('../../authMiddleware'); // Middleware de autenticación
-
+const responded = require('../../red/response'); 
+const controller = require('./Controller'); 
+const authenticateToken = require('../../authMiddleware'); 
 const router = express.Router();
 
 // Obtener todos los informes
@@ -19,7 +18,7 @@ router.get('/', authenticateToken, async (req, res) => {
 router.get('/:id', authenticateToken, async (req, res) => {
     try {
         const report = await controller.getReportById(req.params.id);
-        if (report.length > 0) { // Asegúrate de que el resultado sea un array con al menos un elemento
+        if (report.length > 0) { 
             responded.success(req, res, report[0], 200);
         } else {
             responded.error(req, res, 'Informe no encontrado', 404);

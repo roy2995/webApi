@@ -1,11 +1,10 @@
 const express = require('express');
-const responded = require('../../red/response'); // Manejador de respuestas
-const controller = require('./Controller'); // Controlador de contingencias
+const responded = require('../../red/response'); 
+const controller = require('./Controller'); 
 const authenticateToken = require('../../authMiddleware');
 
 const router = express.Router();
 
-// Rutas GET sin autenticación
 // Obtener todas las contingencias
 router.get('/', async (req, res) => {
     try {
@@ -26,7 +25,6 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-// Rutas protegidas por autenticación
 // Crear una nueva contingencia
 router.post('/', authenticateToken, async (req, res) => {
     try {

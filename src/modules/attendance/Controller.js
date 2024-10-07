@@ -42,7 +42,7 @@ async function checkAttendanceToday(userId) {
         WHERE user_id = ? AND DATE(check_in) = CURDATE()`;
     
     const result = await db.executeQuery(query, [userId]);
-    return result.length > 0;  // Si tiene registros, devuelve true
+    return result.length > 0; 
 }
 
 module.exports = {

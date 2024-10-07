@@ -71,7 +71,6 @@ router.put(
     '/:id',
     authenticateToken,
     [
-        // Validar que check_out sea una fecha y hora en formato ISO8601
         check('check_out')
             .isISO8601().withMessage('El formato de la fecha y hora de check-out es incorrecto')
             .not().isEmpty().withMessage('El campo check-out es obligatorio')

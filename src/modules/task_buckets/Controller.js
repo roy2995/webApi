@@ -1,5 +1,5 @@
 const db = require('../../DB/mysql');
-const TABLE = 'task_buckets';  // Nombre correcto de la tabla
+const TABLE = 'task_buckets';  
 
 // Obtener todas las relaciones entre tareas y buckets
 async function getAllTaskBuckets() {
@@ -15,7 +15,6 @@ async function getTaskBucketsByTaskId(task_id) {
 
 // Crear una nueva relación entre tarea y bucket
 const createTaskBucket = async (data) => {
-    // Verificar si existen task_id y bucket_id
     const taskExists = await db.executeQuery('SELECT * FROM task WHERE ID = ?', [data.task_id]);
     const bucketExists = await db.executeQuery('SELECT * FROM bucket WHERE ID = ?', [data.bucket_id]);
 

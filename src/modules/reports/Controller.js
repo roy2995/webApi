@@ -1,5 +1,5 @@
 const db = require('../../DB/mysql');
-const TABLE = 'reports'; // Asegúrate de que este sea el nombre correcto de la tabla
+const TABLE = 'reports';
 
 // Función para obtener todos los informes
 async function getAllReports() {
@@ -19,7 +19,7 @@ async function createReport(data) {
     const values = [JSON.stringify(data.content), data.user_id, data.bucket_id, data.contingencies_id];
     return db.executeQuery(query, values)
         .then(result => {
-            console.log('Informe creado con ID:', result.insertId); // Para depuración
+            console.log('Informe creado con ID:', result.insertId); 
             return { id: result.insertId, ...data };
         })
         .catch(error => { 
@@ -35,10 +35,10 @@ async function updateReport(id, data) {
     return db.executeQuery(query, values)
         .then(result => {
             if (result.affectedRows > 0) {
-                console.log(`Informe con ID ${id} actualizado.`); // Para depuración
+                console.log(`Informe con ID ${id} actualizado.`);
                 return true;
             } else {
-                console.warn(`No se encontró informe con ID ${id}.`); // Para depuración
+                console.warn(`No se encontró informe con ID ${id}.`); 
                 return false;
             }
         });
@@ -50,10 +50,10 @@ async function deleteReport(id) {
     return db.executeQuery(query, [id])
         .then(result => {
             if (result.affectedRows > 0) {
-                console.log(`Informe con ID ${id} eliminado.`); // Para depuración
+                console.log(`Informe con ID ${id} eliminado.`); 
                 return true;
             } else {
-                console.warn(`No se encontró informe con ID ${id} para eliminar.`); // Para depuración
+                console.warn(`No se encontró informe con ID ${id} para eliminar.`); 
                 return false;
             }
         });

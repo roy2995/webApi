@@ -1,7 +1,7 @@
 const express = require('express');
-const responded = require('../../red/response'); // Control de respuestas
-const controller = require('./Controller'); // Controlador de progress_task
-const authenticateToken = require('../../authMiddleware'); // Middleware de autenticación
+const responded = require('../../red/response'); 
+const controller = require('./Controller'); 
+const authenticateToken = require('../../authMiddleware'); 
 
 const router = express.Router();
 

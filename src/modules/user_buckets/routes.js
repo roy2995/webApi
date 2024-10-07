@@ -1,6 +1,6 @@
 const express = require('express');
-const responded = require('../../red/response'); // Manejo de respuestas
-const controller = require('./Controller'); // Importar el controlador
+const responded = require('../../red/response'); 
+const controller = require('./Controller');
 
 const router = express.Router();
 

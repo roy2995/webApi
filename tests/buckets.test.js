@@ -23,7 +23,7 @@ describe('API Buckets Endpoints', () => {
 
         expect(res.statusCode).toEqual(201);
         expect(res.body.body).toHaveProperty('id');
-        bucketId = res.body.body.id; // Guardamos el ID del bucket creado
+        bucketId = res.body.body.id; 
     });
 
     it('Debería obtener un bucket específico por ID', async () => {
@@ -32,7 +32,7 @@ describe('API Buckets Endpoints', () => {
             .set('Authorization', `Bearer ${token}`);
         expect(res.statusCode).toEqual(200);
         expect(res.body.body[0]).toHaveProperty('ID');
-        expect(res.body.body[0].ID).toBe(bucketId); // Verificamos que el ID es correcto
+        expect(res.body.body[0].ID).toBe(bucketId); 
     });
 
     it('Debería actualizar un bucket existente', async () => {
