@@ -10,10 +10,11 @@ const taskRoutes = require('./modules/task/routes');
 const userBucketRoutes = require('./modules/user_buckets/routes');
 const bucketRoutes = require('./modules/buckets/routes');
 const taskBucketRoutes = require('./modules/task_buckets/routes');
-const progressBucketRoutes = require('./modules/progress_buckets/routes'); // Agregar esta línea
+const progressBucketRoutes = require('./modules/progress_buckets/routes');
 const contingenciesRoutes = require('./modules/contigencies/routes');
 const progressTaskRoutes = require('./modules/progress_task/routes');
 const reportsRoutes = require('./modules/reports/routes');
+const progressContingenciesRoutes = require('./modules/progress_contingencies/routes');
 const authenticateToken = require('./authMiddleware');
 
 const app = express();
@@ -42,5 +43,6 @@ app.use('/api/progress_buckets', progressBucketRoutes);
 app.use('/api/progress_tasks', authenticateToken, progressTaskRoutes);
 app.use('/api/contingencies', contingenciesRoutes);
 app.use('/api/reports', authenticateToken, reportsRoutes);
+app.use('/api/progress_contingencies', authenticateToken, progressContingenciesRoutes);
 
 module.exports = app;

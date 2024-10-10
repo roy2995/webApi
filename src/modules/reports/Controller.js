@@ -16,16 +16,20 @@ async function getReportById(id) {
 // Función para crear un nuevo informe
 async function createReport(data) {
     const query = `INSERT INTO ${TABLE} (content, user_id, bucket_id, contingencies_id) VALUES (?, ?, ?, ?)`;
-    const values = [JSON.stringify(data.content), data.user_id, data.bucket_id, data.contingencies_id];
-    return db.executeQuery(query, values)
-        .then(result => {
-            console.log('Informe creado con ID:', result.insertId); 
-            return { id: result.insertId, ...data };
-        })
-        .catch(error => { 
-            console.error('Error en la creación del informe:', error); 
-            throw error; 
-        });
+    
+    const values = [
+        JSON.stringify(data.Reports),  
+        data.user_id,                  
+        data.bucket_id,
+        data.contingencies_id
+    ];
+
+    const result = await db.executeQuery(query, values);
+    
+    return {
+        id: result.insertId,
+        ...data
+    };
 }
 
 // Función para actualizar un informe existente
