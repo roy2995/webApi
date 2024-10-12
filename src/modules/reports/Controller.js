@@ -18,7 +18,7 @@ async function createReport(data) {
     const query = `INSERT INTO ${TABLE} (content, user_id, bucket_id, contingencies_id) VALUES (?, ?, ?, ?)`;
     
     const values = [
-        JSON.stringify(data.Reports),  
+        JSON.stringify(data.content),  // Cambia data.Reports por data.content
         data.user_id,                  
         data.bucket_id,
         data.contingencies_id
