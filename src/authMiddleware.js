@@ -12,7 +12,7 @@ function authenticateToken(req, res, next) {
         const newToken = jwt.sign(
             { id: user.id, username: user.username },
             process.env.ACCESS_TOKEN_SECRET,
-            { expiresIn: '15m' }
+            { expiresIn: '24h' }
         );
 
         res.setHeader('Authorization', `Bearer ${newToken}`);
