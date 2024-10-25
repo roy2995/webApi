@@ -19,9 +19,9 @@ const authenticateToken = require('./authMiddleware');
 
 const app = express();
 
-// Middleware para permitir CORS
+// Middleware para permitir CORS desde múltiples orígenes
 app.use(cors({
-    origin: ' http://localhost:5173/'
+    origin: ['http://localhost:5173', 'https://react-weeb-4nc8a0xhv-roy2995s-projects.vercel.app']
 }));
 
 // Otros middlewares
