@@ -33,8 +33,8 @@ app.use(cors({
         'https://react-weeb-app-6vfa-qq6dbuypb-roy2995s-projects.vercel.app',
         'https://react-weeb-app-6vfa-owg45zpw2-roy2995s-projects.vercel.app/',
         'https://react-weeb-app-6vfa-owg45zpw2-roy2995s-projects.vercel.app',
-        'http://www.gestionhbc.com/',
-        'http://www.gestionhbc.com'
+        'https://www.gestionhbc.com/',
+        'https://www.gestionhbc.com'
     ]
 }));
 
