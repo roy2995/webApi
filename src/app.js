@@ -28,7 +28,9 @@ app.use(cors({
         'https://react-weeb-m2nf2ajke-roy2995s-projects.vercel.app/',
         'https://react-weeb-m2nf2ajke-roy2995s-projects.vercel.app',
         'https://react-weeb-5gqt5h6dn-roy2995s-projects.vercel.app/',
-        'https://react-weeb-5gqt5h6dn-roy2995s-projects.vercel.app'
+        'https://react-weeb-5gqt5h6dn-roy2995s-projects.vercel.app',
+        'https://react-weeb-app-6vfa-qq6dbuypb-roy2995s-projects.vercel.app/',
+        'https://react-weeb-app-6vfa-qq6dbuypb-roy2995s-projects.vercel.app'
     ]
 }));
 
