@@ -22,8 +22,8 @@ const app = express();
 // Middleware para permitir CORS desde múltiples orígenes
 app.use(cors({
     origin: [
-        'https://react-weeb-59a5zoags-roy2995s-projects.vercel.app/',
-        'https://react-weeb-59a5zoags-roy2995s-projects.vercel.app',
+        'https://react-weeb-app-6vfa-r7d4iskwa-roy2995s-projects.vercel.app/',
+        'https://react-weeb-app-6vfa-r7d4iskwa-roy2995s-projects.vercel.app',
         'http://localhost:5173/',
         'http://localhost:5173',
         'https://react-weeb-m2nf2ajke-roy2995s-projects.vercel.app/',
